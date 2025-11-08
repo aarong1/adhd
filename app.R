@@ -1130,7 +1130,8 @@ echarts4rOutput("dummy", height = "0px")
 server <- function(input, output, session) {
 
     output$dummy <- renderEcharts4r({
-        echarts() %>%
+        e_charts(mtcars ,cyl) %>%
+            e_line(mpg) %>%
             e_theme('roma')}
                                 )
 
