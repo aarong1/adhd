@@ -24,8 +24,10 @@ library(profvis)
 source('footer.R')
 source('modules/startup_overlay/startup_overlay_div.R')
 
+load('deploy.RData')
+
 graph_wrapper <- function(..., header =NULL){
-    
+
     div(class = "grid-item grid-item--graph theme-green",
         div(class = "grid-item-content",
             div(class = "chart-card",
@@ -42,15 +44,16 @@ graph_wrapper <- function(..., header =NULL){
 # theme_x <- readLines('theme.json')
 
 ui <- page_fluid( id = 'main-content',
-                  theme = bs_theme(version = 5, font_scale = 0.8,
+                  theme = bs_theme(version = 5,
                                    bootswatch = 'litera',
-                                   primary = 'purple'), 
+                                   font_scale = 0.9,
+                                   primary = 'purple'),
 
                   # startup_overlay_div(5000,7000),
-                  
+
                   tags$head(
                   # Include external dependencies
-            
+
                       # Packery CSS and JS from CDN (no Draggabilly needed)
                       tags$script(src = "https://unpkg.com/packery@2/dist/packery.pkgd.min.js"),
                       HTML('<script>
@@ -80,7 +83,7 @@ ui <- page_fluid( id = 'main-content',
 --shadow-medium: 0 4px 6px rgba(158, 123, 123, 0.07);
 --shadow-heavy: 0 10px 25px rgba(0, 0, 0, 0.1);
 --border-radius: 12px;
---border-radius-lg: 16px; 
+--border-radius-lg: 16px;
 --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 --fa-style-family-brands: "Font Awesome 6 Brands";
 --fa-font-brands: normal 400 1em/1 "Font Awesome 6 Brands";
@@ -104,9 +107,14 @@ box-shadow: var(--shadow-light);
 </style>'),
                       # Custom CSS styling
                       tags$style("
-* { box-sizing: border-box; } 
+* { box-sizing: border-box; }
 
-body { 
+html {
+  scroll-behavior: smooth;
+  font-size:1.0rem;
+}
+
+body {
   /*font-family: sans-serif;  */
   margin: 0;
   padding: 0;
@@ -217,7 +225,7 @@ a.nav-iten:hover{
   max-width: 70vw;
   min-height: 100vh;
 }
-2
+
 /* clear fix */
 .grid:after {
   content: '';
@@ -227,7 +235,7 @@ a.nav-iten:hover{
 
 /* ---- .grid-item ---- */
 .grid-item {
-  float: left;
+  /*float: left;*/
   background: white;
   border-radius:20px;
   box-shadow: 0 1px 3px rgba(100, 0, 0, 0.01);
@@ -239,7 +247,7 @@ a.nav-iten:hover{
   margin-bottom: 2px;
 }
 
-.grid-item-content {22
+.grid-item-content {
   padding: 20px;
   border-radius: 20px;
   width: 100%;
@@ -250,12 +258,13 @@ a.nav-iten:hover{
 .grid-item--width2 { width: 150px; }
 .grid-item--height2 { height: 150px; }
 .grid-item--small { width: 150px; height: 150px; }
-.grid-item--graph { width: 500px; height: 400px; }
+.grid-item--graph { width: 700px; height: 600px; }
 
 /* Expanded state */
 .grid-item.is-expanded {
   z-index: 100;
 }
+
 
 .grid-item.is-expanded.grid-item--small {
   width: 400px;
@@ -263,8 +272,9 @@ a.nav-iten:hover{
 }
 
 .grid-item.is-expanded.grid-item--graph {
-  width: 700px;
-  height: 600px;
+  width: 800px;
+  height: 500px;
+  padding:1rem;
 }
 
 .grid-item.is-expanded .grid-item-content {
@@ -272,9 +282,9 @@ a.nav-iten:hover{
 }
 
 .grid-item:hover {
- /* 
+ /*
   margin-right: 0px;
-  margin-bottom: 0px; 
+  margin-bottom: 0px;
   */
   transform: translate(2px 2px);
   z-index:1000;
@@ -410,7 +420,7 @@ a.nav-iten:hover{
   padding:0.5rem;
   border-radius:0.5rem;
   transition:all 0.5s ease;
-} 
+}
 
 .nav-card:hover {
     opacity:0.9;
@@ -475,12 +485,12 @@ text-decoration:none !important;
 }
 
   .glass-card {
-  background: rgba(255, 255, 255, 0.44); /* 0.14 */
+  background: rgba(255, 255, 255, 0.14); /* 0.14 */
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  border-radius: 20px;
+  border-radius: 0px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
     inset 0 -1px 0 rgba(255, 255, 255, 0.1),
@@ -498,7 +508,7 @@ text-decoration:none !important;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0.6),
     transparent
   );
 }
@@ -512,53 +522,27 @@ text-decoration:none !important;
   height: 100%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0.6),
     transparent,
-    rgba(255, 255, 255, 0.3)
+    rgba(255, 255, 255, 0.2)
   );
 }
 
 ")
                   ),
-                  
+
                   # Main layout container
 
                   # Control Panel
 
-                 
-                  # HTML(' <!-- Navigation -->
-                  #    <nav class="dashboard-nav">
-                  #    <div class="nav-content">
-                  #    <div class="nav-items">
-                  #    <a href="#overview" class="nav-item active" data-section="overview" data-bs-toggle="tab" data-bs-target="#overview">
-                  #    <i class="fas fa-tachometer-alt"></i>
-                  #    <span>Overview</span>
-                  #    </a>
-                  #    <a href="#geography" class="nav-item" data-section="geography"  data-bs-toggle="tab" data-bs-target="#geography">
-                  #    <i class="fas fa-map-marked-alt"></i>
-                  #    <span>Geographic Analysis</span>
-                  #    </a>
-                  #    <a href="#population" class="nav-item" data-section="population"  data-bs-toggle="tab" data-bs-target="#population">
-                  #    <i class="fas fa-users"></i>
-                  #    <span>Population Insights</span>
-                  #    </a>
-                  #    <a href="#risk-factors" class="nav-item" data-section="risk-factors"  data-bs-toggle="tab" data-bs-target="#risk-factors">
-                  #    <i class="fas fa-exclamation-triangle"></i>
-                  #    <span>Risk Factors</span>
-                  #    </a>
-                  #    <a href="#data-explorer" class="nav-item" data-section="data-explorer"  data-bs-toggle="tab" data-bs-target="#data-explorer">
-                  #    <i class="fas fa-table"></i>
-                  #    <span>Data Explorer</span>
-                  #    </a>
-                  #    </div>
-                  #    </div>
-                  #    </nav>'),
 
+
+                  div(class = 'w-100 navbar p-0 fixed-top d-flex gap-0 flex-column flex-wrap glass-card',
                   shiny::tags$nav(
-                      style='position:fixed;top:14px;left:0px',
-                      class = "navbar w-100 shadow-lg glass-card mb-3 p-2 mt-5 rounded", # bg-light
+                      #style='position:fixed;top:0px;left:0px',
+                      class = "navbar w-100 glass-card p-3 rounded", # bg-light mt-5
                       shiny::h4(  "Population Health", span(class = 'lead','Public Health Agency'),
-                                  
+
                                   HTML('<h7><span class="badge rounded-pill bg-opacity-75 bg-warning ">ADHD </span></h7>'),
                                   span(HTML('<h7><span class="badge rounded-pill text-white bg-opacity-75 bg-primary">PHA', '' ,'</span></h7>')),
                                   HTML('<h7><span class="badge rounded-pill bg-opacity-75 bg-info ">Population Health Model </span></h7>'),
@@ -569,329 +553,399 @@ text-decoration:none !important;
                        OPIP bid</span>
                        </a> -->
                        </h7>'),
-                                  
                                   class = "navbar-brand mb-0 w-100"
                       )
                   ),
-                  
-                  div(style='top:20vh;width:12vw;z-index:1000',class = ' ms-2  p-3 d-flex flex-column display-absolute position-fixed left-0 ',#shadow-sm glass-card
-                      
-                      div(class = "nav-section",
-                          h6(class = "bg-opacity-100 border-5  p-2 rounded-3  text-bg-dark text-light", "Health Burden"), #text-body-secondary
-                          div(class = "nav-item",
-                              span(class = "nav-icon"),
-                              "Dashboard"
-                          )#,
-                          # div(class = "nav-item active",
-                          #     span(class = "nav-icon"),
-                          #     "Analytics"
-                          # ),
-                          # div(class = "nav-item",
-                          #     span(class = "nav-icon"),
-                          #     "Reports"
-                          #)
-                      ),
-                      
-                      # div(class = "nav-section",
-                      #     h6(class = "bg-opacity-100 border-5  p-2 rounded-3  text-bg-dark text-light",
-                      #        "ADHD"),
-                      #     
-                      #     div(class = "nav-item",
-                      #         span(class = "nav-icon"),
-                      #         "Risk"
-                      #     )#,
-                          
-                          # div(class = "nav-item",
-                          #     span(class = "nav-icon"),
-                          #     "Geography"
-                          # ),
-                          # div(class = "nav-item",
-                          #     span(class = "nav-icon"),
-                          #     "Population"
-                          # ),
-                          # 
-                          # div(class = "nav-item",
-                          #     span(class = "nav-icon"),
-                          #     "Northern Trust"
-                          # ),
-                          # div(class = "nav-item",
-                          #     span(class = "nav-icon"),
-                          #     "Lifestyle"
-                          # ),
-                          # div(class = "nav-item",
-                          #     span(class = "nav-icon"),
-                          #     "Deprivation"
-                          # ),
-                          # div(class = "nav-item",
-                          #     span(class = "nav-icon"),
-                          #     "Society"
-                          #)
-                      # )#,
-                      # div(class = "nav-section",
-                      #     h6(class = "bg-opacity-100  border-5  p-2 rounded-3 text-bg-dark text-light", "Intervention"), #nav-section-title
-                      #     div(class = "nav-item",
-                      #         span(class = "nav-icon"),
-                      #         "Specify"
-                      #     ),
-                      #     div(class = "nav-item",
-                      #         span(class = "nav-icon"),
-                      #         "Scenarios"
-                      #     )
-                      # )
-                      
-                  ),
-                  
-                  div(class='mt-5 pt-5'),
-                  HTML('<nav id = "top-top" 
-                                  style = "position:fixed;top:0px;margin-inline:-12px;backdrop-filter: blur(5px);background: #00D4FF;
-                                  background: linear-gradient(55deg, rgba(0, 212, 255, 06) 55%, rgba(0, 115, 255, 0.7) 87%);", 
-                                  class="w-100 bg-gradient-blue-cyan bg-opacity-50">
+
+                 # div(class='mt-5 pt-5'),##position:fixed;top:0px;
+                  HTML('<nav id = "top-top"
+                                  style = "width:100%;
+                                  margin-inline:-12px;backdrop-filter: blur(5px);background: #00D4FF;
+                                  background: linear-gradient(55deg, rgba(0, 212, 255, 06) 55%, rgba(0, 115, 255, 0.7) 87%);",
+                                  class=" w-100 bg-gradient-blue-cyan bg-opacity-50">
                       <div class="text-white">
                       <div id ="top-nav-content" class="d-flex gap-5 justify-content-center align-items-center">
-                      <a href="#overview" class="nav-item bg-opacity-100  nav-iten p-1 px-4 rounded-pill text-white" data-section="overview" data-bs-toggle="tab" data-bs-target="#overview">
+                      <a href="#overview-section" class="nav-item bg-opacity-100 nav-iten p-1 px-4 rounded-pill text-white">
                       <i class="fas fa-tachometer-alt"></i>
-                      <span>Overview</span>
+                      <span class="fs-6">Overview</span>
                       </a>
-                      <a href="#geography" class="nav-item bg-opacity-100  nav-iten p-1 px-4 rounded-pill text-white" data-section="geography" data-bs-toggle="tab" data-bs-target="#geography">
-                      <i class="fas fa-map-marked-alt"></i>
-                      <span>Geographic Analysis</span>
-                      </a>
-                      <a href="#population" class="nav-item bg-opacity-100  nav-iten p-1 px-4 rounded-pill text-white active" data-section="population" data-bs-toggle="tab" data-bs-target="#population">
-                      <i class="fas fa-users"></i>
-                      <span>Population Insights</span>
-                      </a>
-                      <a href="#risk-factors" class="nav-item bg-opacity-100  nav-iten p-1 px-4 rounded-pill text-white" data-section="risk-factors" data-bs-toggle="tab" data-bs-target="#risk-factors">
+                      <a href="#evidence-section" class="nav-item bg-opacity-100 nav-iten p-1 px-4 rounded-pill text-white">
                       <i class="fas fa-exclamation-triangle"></i>
-                      <span>Risk Factors</span>
+                      <span class="fs-6">Evidence</span>
                       </a>
-                      <a href="#data-explorer" class="nav-item bg-opacity-100  nav-iten m-3 p-1 px-4 rounded-pill text-white" data-section="data-explorer" data-bs-toggle="tab" data-bs-target="#data-explorer">
-                      <i class="fas fa-table"></i>
-                      <span>Data Explorer</span>
+                      <a href="#prevalence-section" class="nav-item bg-opacity-100 nav-iten p-1 px-4 rounded-pill text-white">
+                      <i class="fas fa-tachometer-alt"></i>
+                      <span class="fs-6">Prevalence</span>
+                      </a>
+                      <a href="#incidence-section" class="nav-item bg-opacity-100 nav-iten p-1 px-4 rounded-pill text-white">
+                      <i class="fas fa-map-marked-alt"></i>
+                      <span class="fs-6">Incidence</span>
+                      </a>
+                      <a href="#downstream-section" class="nav-item bg-opacity-100 nav-iten p-1 m-3 px-4 rounded-pill text-white">
+                      <i class="fas fa-users"></i>
+                      <span class="fs-6" >Downstream Service Demand</span>
                       </a>
                       </div>
                       </div>
-                      </nav>'),
-                  
-                  div(class = "main-container",
-                      
+                      </nav>')
+
+                 ),
+
+
+
+                 div(style='top:20vh;width:12vw;z-index:1000',class = ' ms-2  p-3 d-flex flex-column display-absolute position-fixed left-0 ',#shadow-sm glass-card
+
+                     div(class = "nav-section",
+                         h6(class = "bg-opacity-100 border-5  p-2 rounded-3  text-bg-dark text-light", "Health Burden"), #text-body-secondary
+                         div(class = "nav-item",
+                             span(class = "nav-icon"),
+                             "Dashboard"
+                         )#,
+                         # div(class = "nav-item active",
+                         #     span(class = "nav-icon"),
+                         #     "Analytics"
+                         # ),
+                         # div(class = "nav-item",
+                         #     span(class = "nav-icon"),
+                         #     "Reports"
+                         #)
+                     ),
+
+                     # div(class = "nav-section",
+                     #     h6(class = "bg-opacity-100 border-5  p-2 rounded-3  text-bg-dark text-light",
+                     #        "ADHD"),
+                     #
+                     #     div(class = "nav-item",
+                     #         span(class = "nav-icon"),
+                     #         "Risk"
+                     #     )#,
+
+                     # div(class = "nav-item",
+                     #     span(class = "nav-icon"),
+                     #     "Geography"
+                     # ),
+
+                     # div(class = "nav-section",
+                     #     h6(class = "bg-opacity-100  border-5  p-2 rounded-3 text-bg-dark text-light", "Intervention"), #nav-section-title
+                     #     div(class = "nav-item",
+                     #         span(class = "nav-icon"),
+                     #         "Specify"
+                     #     ),
+                     #     div(class = "nav-item",
+                     #         span(class = "nav-icon"),
+                     #         "Scenarios"
+                     #     )
+                     # )
+
+                 ),
+
+
+                  div(class = "main-container", `data-bs-spy` = "scroll", `data-bs-target` = "#top-nav-content", `data-bs-offset` = "70",
+                      # div(class='mt-5 pt-5')
                       # Main content area
                       div(class = "content-area",
                           # div( class="tab-pane active", id="overview", role="tabpanel", `aria-labelledby`="overview",
-                          
+
                           div(class = "tab-content",
-                              
+
                               # Dashboard Tab Content
-                              
+
                               div(id = "dashboard-tab", class = "tab-pane show active", #
-                                
+
                                   div(class = "container-fluid",
-                                      style = "padding-left: 17%;padding-top:10%",
+                                      style = "padding-left: 15%;padding-top:5%;padding-right:8%",
 
-                                      div(class="alert alert-light my-5 opacity-100 shadow-sm", 
-                                          h5('ADHD Estimate in the population'),
-                                          span(class='lead','Comparison of approaches for prevalence and incidence')),
-                                      
-                                      div(class='d-flex flex-row py-5  gap-5 flex-wrap',#grid
-                                                          
-graph_wrapper(plotOutput('prevalence_rates_graph') ,header=span(span(class='fs-5','ADHD Prevalence') ,
-                                                                span(class='m-1  badge rounded-pill text-bg-secondary','Rates'), div(class='text-muted','Estimated Actual')),
-              div(class='p-3 rounded-2 text-bg-light','Comparison of simulations from the paper',icon("arrow-up-right-from-square"), 'with extrapolated and prevalence and incidence rates',
-                  'also showing is thengland experimantl statistics ',icon("arrow-up-right-from-square") ,
-                  'with nice prevlaence applied',icon("arrow-up-right-from-square"),
-                  'and paramters lifted from the teams estimates')),
+                                      # Overview Section
+                                      div(id='overview-section',class='min-vh-100',
+                                          div(class=" bg-white text-dark p-4 my-5 opacity-100 shadow-sm",
+                                              h5('Overview'),
+                                              span(class='','Comparison of approaches for prevalence and incidence')),
 
-graph_wrapper(plotOutput('prevalent_counts_graph') ,header=span('Prevalence' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
-                                                                span(class='ms-2 p-1 text-bg-light','Estimated Actual')),
-              div(class='p-3 rounded-2 text-bg-light','Counts of the same')),
+                                      div(class = "grid-item",
+                                          div(class = "grid-item-content",
+                                              div(class = "chart-card",
+
+                                                  div(class = "card-header",# style = "font-size: 0.5em;",
+                                                      span('Prevalence' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
+                                                                span(class='ms-2 p-1 text-bg-secondary','Estimated Actual'))
+                                                  ),
+                                                  prevalent_counts_e
+                                              )
+                                          ),
+                                          div(class='p-3 rounded-2 text-bg-secondary','Comparison of ADHD prevalence calculations. From the paper ref:end',#icon("arrow-up-right-from-square"),
+                                              'with extrapolated and prevalence and incidence rates.',
+                                              'Also showing is the NHS England experimental statistics ',#icon("arrow-up-right-from-square") ,
+                                              ' NICE prevalence applied',#icon("arrow-up-right-from-square"),
+                                              'and parameters lifted from the PHAs teams estimates')
+
+                                      )),
 
 
-graph_wrapper(plotOutput('prevalence_my_sim_graph') ,header=span('Prevalence' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
+                                      div(id = "evidence-section",class='min-vh-100',
+                                          div(class="bg-white text-dark p-3 rounded-3 fs-5 my-5 opacity-100 shadow-sm",
+                                              h5('Evidence'),
+                                              span(class='','Research and evidence base for ADHD interventions')),
+                                          div(style = "min-height: 400px;",class = 'd-flex flex-row py-5 justify-content-evenly gap-5 flex-wrap',
+                                              graph_wrapper(prev_e ,header=span(span(class='fs-5','Reported historical Prevalence with Projections') ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
+                                                                                span(class='ms-2  badge rounded-pill text-bg-dark','Empirical'),
+                                                                                span(class='ms-2 p-1 text-bg-dark',' GP recorded'))),
+
+                                              graph_wrapper(incid_e ,header=span(span(class='fs-5','Reported historical Incidence with Projections') ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
+                                                                                 span(class='ms-2  badge rounded-pill text-bg-dark','Empirical'),
+                                                                                 span(class='ms-2 p-1 text-bg-dark',' GP recorded'))),
+
+
+                                          ),
+                                          div(class='p-3 m-3 rounded-3 text-bg-info',
+                                              'The above shows the empirically reported prevalence and incidence rates per 10,00 ppl and 100,000 ppl-years respectively from ',
+                                              shiny::tags$cite(' Attention-deficit hyperactivity disorder diagnoses and prescriptions in UK primary care, 2000-2018: population-based cohort study'),
+                                              'In addition the graphs will show the projections based on these historical rates to 2030.',
+                                              'The projections follow the standard approach conservative time series projections by extrapolating forward using a log linear fit to the trend with a
+        gentlely decaying gradient.  These rate were ultimately used to simulate the population prevalence by using projected prevalence,
+        and then by pausing fixing prevalence at 2020,a nd using incidence rates to include new cases going forward. Deaths and aging are include in population dynamics.
+        Results are by age, sex and HSCT.')
+                                      ), # End evidence section # End incidence section
+
+
+
+                                      # Prevalence Section
+
+                                      div(id = "prevalence-section",class='min-vh-100',
+
+                                          div(class=" bg-white text-dark p-4 my-5 opacity-100 shadow-sm",
+                                              h5('ADHD Estimate in the population'),
+                                              span(class='','Comparison of approaches for prevalence and incidence')),
+
+                                      div(class='d-flex flex-row py-5 justify-content-evenly gap-5 flex-wrap',#grid
+
+graph_wrapper(prevalence_rates_graph_e ,header=span(span(class='fs-5','ADHD Prevalence') ,
+                                                                span(class='m-1  badge rounded-pill text-bg-secondary','Rates'), div(class='text-muted','Estimated Actual'))),
+
+graph_wrapper(prevalent_counts_e ,header=span(span(class='fs-5','Prevalence by age') ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
+                                                                span(class='ms-2 p-1 text-bg-secondary','Estimated Actual'))),
+
+graph_wrapper(prevalence_my_sim_e ,header=span(span(class='fs-5','Prevalence') ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
                                                                  span(class='ms-2  badge rounded-pill text-bg-dark','Simulation'),
-                                                                 span(class='ms-2 p-1 text-bg-dark','Estimated GP recorded')),
-              div(class='p-3 rounded-2 text-bg-light','Counts of the same')),
+                                                                 span(class='ms-2 p-1 text-bg-dark','Estimated GP recorded'))),
+
+graph_wrapper(prevalence_HSCT_my_sim_e ,header=span(span(class='fs-5','Prevalence by HSCT') ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
+                                               span(class='ms-2  badge rounded-pill text-bg-dark','Simulation'),
+                                               span(class='ms-2 p-1 text-bg-dark','Estimated GP recorded'))),
+
+                                      ),
+div(class='ms-2 fs-6  badge rounded-pill bg-primary', 'An underdiagnosis rate of 1-in-5 is used across ages',icon("arrow-up-right-from-square"))
+
+), # End prevalence section
+
+# Evidence Section (placeholder)
+
+
+
+
+# Incidence Section
+div(id = "incidence-section",class='min-vh-100',
+div(class="text-white bg-dark fs-5 p-3 rounded-2 my-5 opacity-100 shadow-sm", h5('Incidence' ), span(class='','Transitions of Children to adult services. Incidence is largely interpreted as diagnosis.')),
+div(class='d-flex flex-row gap-5 py-5 justify-content-evenly min-vh-100 flex-wrap',#grid
+
+graph_wrapper(yearly_incidence_e ,header=span('Incidence' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-muted','Yearly')),),
+
+graph_wrapper(cumulative_incidence_e ,header=span('Incidence' ,span(class='ms-2 badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-muted','Cumulative')),
+      ),
+
+graph_wrapper(new_adult_transitions_e ,header=span('18 year olds Transitioning to Adults' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-muted','Cumulative')),
+            )
+
+)
+),
+
+# Downstream Section
+div(id = "downstream-section",class='min-vh-100',
+div(class="text-white bg-primary fs-5 p-3 rounded-2 my-5 opacity-100 shadow-sm", h5('Referrals'), span(class='','Adults, Children and Trusts')),
+div(class='d-flex flex-row gap-5 py-5 justify-content-evenly min-vh-100  flex-wrap',#grid
+
+graph_wrapper(adult_referrals_e ,header=span('Adult Referrals' ,span(class='ms-2 text-bg-secondary badge rounded-pill','Counts'),span(class='ms-2 p-1 text-muted','Estimated Actual')),
+      ),
+graph_wrapper(accepted_adult_referrals_e ,header=span('Accepted Adult Referrals' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-muted','Cumulative')),
+           ),
+
+graph_wrapper(header=span('Adult Referals by HSCT' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-muted','Cumulative')),
+              div(style = 'font-size: 11px;', reactable(select(adult_referrals_tbl,Year = year, HSCT, Count = n) ))),
+
+graph_wrapper(child_referrals_e ,header=span('Child Referrals' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-muted','Cumulative')),
+              div(class='p-3 rounded-2 text-bg-secondary','0.1% of prevalence per year assumed referral rate applied to estimated actual prevalence')),
+graph_wrapper(accepted_child_referrals_e ,header=span('Accepted Child Referrals' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-muted','Cumulative')),
+              div(class='p-3 rounded-2 text-bg-secondary','70% acceptance rate per referral applied')
+
+
+) # End prevalence section
+),
+              div(class='ms-2 fs-6  badge rounded-pill bg-primary', '0.1% of prevalence was choosen for the total referrals ',icon("warning")),
+              div(class='ms-2 fs-6  badge rounded-pill bg-primary', '70% of referrals were assumed to be accepted  ',icon("warning"))
+),
+
+div(id = "Links",class='min-vh-100 pt-5 mt-5',
+    div(class="text-dark bg-white fs-5 p-3 rounded-2 my-5 opacity-100 shadow-sm", h5('Links'), span(class='','')),
+    div(class='justify-content-evenly min-vh-50 flex-wrap',#grid
+# d-flex flex-row gap-2 py-5
+
+                                                 div(class = "grid-item nav-card float-left analytics bg-opacity-50",
+                                                     div(onclick = "window.open('https://pubmed.ncbi.nlm.nih.gov/37455585','_blank')",
+                                                         class = "nav-card-icon",
+                                                         icon("arrow-up-right-from-square")),
+                                                     div(class = "nav-card-title", "NICE"),
+                                                     div(class = "nav-card-description text-wrap ", "NICE estimates,
+                                                         used by ADHD UK and NHS England for ADHD real prevalence estiamtes"),
+                                                 ),
+                                                 div(class = "grid-item nav-card float-left settings bg-opacity-50",
+                                                     div(onclick = "window.open('https://digital.nhs.uk/data-and-information/publications/statistical/adult-psychiatric-morbidity-survey/survey-of-mental-health-and-wellbeing-england-2023-24/attention-deficit-hyperactivity-disorder','_blank')",
+                                                         class = "nav-card-icon",
+                                                         icon("arrow-up-right-from-square")),
+                                                     div(class = "nav-card-title", "NHS England"),
+                                                     div(class = "nav-card-description", "Experimental Mental Health Statistics"),
+                                                 ),
+
+                                                 div(class = "grid-item nav-card float-left reports bg-opacity-50",
+                                                     div(onclick = "window.open('https://pubmed.ncbi.nlm.nih.gov/37455585','_blank')",
+                                                         class = "nav-card-icon",
+                                                         icon("arrow-up-right-from-square")),
+                                                     div(class = "nav-card-title", "Douglas G J McKechnie"),
+                                                     div(class = "nav-card-description", "Attention-deficit hyperactivity disorder diagnoses and prescriptions in UK primary care, 2000-2018: population-based cohort study"),
+                                                 ),
+
+div(class = "grid-item nav-card float-left analytics bg-opacity-50",
+    div(onclick = "window.open('https://adhduk.org/adhd-statistics/','_blank')",
+        class = "nav-card-icon",
+        icon("arrow-up-right-from-square")),
+    div(class = "nav-card-title", "ADHD UK"),
+    div(class = "nav-card-description text-wrap ", "Rudimentary estimates of devolved nations, adult and children adhd prevalence"),
 
 ),
 
-div(class="alert alert-light fs-5 my-5 opacity-100 shadow-sm", h5('Incidence' ), span(class='lead','Transitions of Children to adult services. Incidence is largely interpreted as diagnosis.')),
-div(class='d-flex flex-row gap-5 py-5 min-vh-100 flex-wrap',#grid
-
-graph_wrapper(plotOutput('yearly_incidence_graph') ,header=span('Incidence' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-bg-dark','Yearly')),
-              div(class='p-3 rounded-2 text-bg-light','Counts of the same')),
-
-graph_wrapper(plotOutput('cumulative_incidence_graph') ,header=span('Incidence' ,span(class='ms-2 badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-bg-dark','Cumulative')),
-              div(class='p-3 rounded-2 text-bg-light','Counts of the same')),
-
-graph_wrapper(plotOutput('new_adult_transitions') ,header=span('18 year olds Transitioning to Adults' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-bg-dark','Cumulative')),
-              div(class='p-3 rounded-2 text-bg-light','Counts of the same'))
-
-),
+div(class = "grid-item nav-card float-left settings bg-opacity-50",
+    div(onclick = "window.open('https://digital.nhs.uk/data-and-information/publications/statistical/mi-adhd/may-2025','_blank')",
+        class = "nav-card-icon",
+        icon("arrow-up-right-from-square")),
+    div(class = "nav-card-title", "NHS England"),
+    div(class = "nav-card-description", "Experimental Mental Health Statistics"),
+)
+))
+)
 
 
-div(class="alert alert-light fs-5 my-5 opacity-100 shadow-sm", h5('Referrals'), span(class='lead','Adults, Children and Trusts')),
-div(class='d-flex flex-row gap-5 py-5 flex-wrap',#grid
-
-graph_wrapper(plotOutput('adult_referals') ,header=span('Adult Referrals' ,span(class='ms-2 text-muted badge rounded-pill','Counts'),span(class='ms-2 p-1 text-bg-dark','Estimated Actual')),
-              div(class='p-3 rounded-2 text-bg-light','Counts of the same')),
-graph_wrapper(plotOutput('accepted_adult_referals') ,header=span('Accepted Adult Referrals' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-bg-dark','Cumulative')),
-              div(class='p-3 rounded-2 text-bg-light','Counts of the same')),
-
-graph_wrapper(plotOutput('child_referals') ,header=span('Child Referals' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-bg-dark','Cumulative')),
-              div(class='p-3 rounded-2 text-bg-light','Counts of the same')),
-graph_wrapper(plotOutput('accepted_child_referals') ,header=span('Accepted Child Referrals' ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),span(class='ms-2 p-1 text-bg-dark','Cumulative')),
-              div(class='p-3 rounded-2 text-bg-light','Counts of the same'))
-
-),
-
-
-
-
-
-
-                                                 
-                                                 div(class = "grid-item nav-card analytics bg-opacity-50",
-                                                     div(onclick = "$('.tab-pane').removeClass('active show');$('#' + 'analytics-tab').addClass('active show')",
-                                                         class = "nav-card-icon",
-                                                         icon("arrow-up-right-from-square")),
-                                                     div(class = "nav-card-title", "Morbidity"),
-                                                     div(class = "nav-card-description", "View detailed analytics"),
-                                                 ),
-                                                 div(class = "grid-item nav-card settings bg-opacity-50",
-                                                     div(onclick = "$('.tab-pane').removeClass('active show');$('#' + 'geography-tab').addClass('active show')",
-                                                         class = "nav-card-icon",
-                                                         icon("arrow-up-right-from-square")),
-                                                     div(class = "nav-card-title", "Geography"),
-                                                     div(class = "nav-card-description", "View detailed analytics"),
-                                                 ),
-                                                 div(class = "grid-item nav-card  bg-opacity-50",
-                                                     div(onclick = "$('.tab-pane').removeClass('active show');$('#' + 'deprivation-tab').addClass('active show')",
-                                                         class = "nav-card-icon",
-                                                         icon("arrow-up-right-from-square")),
-                                                     div(class = "nav-card-title", "Deprivation"),
-                                                     div(class = "nav-card-description", "View detailed analytics"),
-                                                 ),
-                                                 
-                                                 
                                           ) # End of dashboard grid
                                       #, # End of dashboard tab content
-                                      
-                                      
-                                  
                               ),
-                              
+
                               # Analytics Tab Content
-                              div(id = "analytics-tab", class = "tab-pane active show ", #style = "width:100%",
-                                  div(style = 'position:absolute;top:0;left:0;margin-inline:-12px;',#class = "container-fluid",
-                                      div(
-                                          #leafletOutput("mymap", width = '100vw', height = '100vh'),
-                                      ),
-                                  ),
-                                  
-                                  div(class = 'glass-card p-3 me-3',
-                                      style = 'position:absolute;top:12vh;right:0;height:75vh; overflow:scroll; background: rgba(255, 255, 255, 0.64)!important; /* 0.14 */',#class = "container-fluid",
-                                      # style='top:15vh;width:15vw;z-index:1000',class = ' ms-3 p-4 d-flex flex-column display-absolute position-fixed left-0 shadow-sm glass-card'
-                                      div(class = 'd-flex flex-column gap-3 justify-content-between',
-                                          div( span(class = '','BMI'),
-                                               div(style = 'height:150px;width:200px;')
-                                          ),
-                                          div( span(class = '','Age'),
-                                               div(style = 'height:150px;width:200px;')
-                                          ),
-                                          div(span(class = '','Sex'),
-                                              div(style = 'height:150px;width:200px;')
-                                          ),
-                                          div(span(class = '','Deprivation'),
-                                              div(style = 'height:150px;width:200px;')
-                                          ),
-                                          div(span(class = '','Risk'),
-                                              div(style = 'height:250px;width:200px;')
-                                          ),
-                                          div(span(class = '','Risk'),
-                                              div(style = 'height:200px;width:200px;')
-                                          ),
-                                          
-                                          span( class='ms-4',
-                                                h6('Population:',textOutput('headline_count'))
-                                          ),
-                                          span( class='ms-4',
-                                                h6('Qrisk Score:',textOutput('qrisk_average'))
-                                          )
-                                      )
-                                  )
-                                  
-                              ),
-                              
+                              # div(id = "analytics-tab", class = "tab-pane active show ", #style = "width:100%",
+                              #     div(style = 'position:absolute;top:0;left:0;margin-inline:-12px;',#class = "container-fluid",
+                              #         div(
+                              #             #leafletOutput("mymap", width = '100vw', height = '100vh'),
+                              #         ),
+                              #     ),
+                              #
+                              #     div(class = 'glass-card p-3 me-3',
+                              #         style = 'position:absolute;top:12vh;right:0;height:75vh; overflow:scroll; background: rgba(255, 255, 255, 0.64)!important; /* 0.14 */',#class = "container-fluid",
+                              #         # style='top:15vh;width:15vw;z-index:1000',class = ' ms-3 p-4 d-flex flex-column display-absolute position-fixed left-0 shadow-sm glass-card'
+                              #         div(class = 'd-flex flex-column gap-3 justify-content-between',
+                              #             div( span(class = '','BMI'),
+                              #                  div(style = 'height:150px;width:200px;')
+                              #             ),
+                              #             div( span(class = '','Age'),
+                              #                  div(style = 'height:150px;width:200px;')
+                              #             ),
+                              #             div(span(class = '','Sex'),
+                              #                 div(style = 'height:150px;width:200px;')
+                              #             ),
+                              #             div(span(class = '','Deprivation'),
+                              #                 div(style = 'height:150px;width:200px;')
+                              #             ),
+                              #             div(span(class = '','Risk'),
+                              #                 div(style = 'height:250px;width:200px;')
+                              #             ),
+                              #             div(span(class = '','Risk'),
+                              #                 div(style = 'height:200px;width:200px;')
+                              #             ),
+                              #
+                              #             span( class='ms-4',
+                              #                   h6('Population:',textOutput('headline_count'))
+                              #             ),
+                              #             span( class='ms-4',
+                              #                   h6('Qrisk Score:',textOutput('qrisk_average'))
+                              #             )
+                              #         )
+                              #     )
+                              #
+                              # ),
+
                               # Reports Tab Content
-                              div(id = "reports-tab", class = " tab-pane active show",# style = "display: none;",
-                                  div(class = "container-fluid", style = "padding-left: 20%;",
-                                      h3("Population Health Data - Interactive Pivot Analysis"),
-                                      p(class='lead',"Drag columns to create custom analysis. Use dimensions for grouping, measures for aggregation."),
-                                      div(style = "font-size: 0.6rem !important;",
-                                          # Pivot module UI
-                                          pivot_module_ui("pivot_reports",
-                                                          data_names = c("sex", "age_risk", "county", "hsct", "bmi",
-                                                                         "Urban_status", "mdm_quintile_soa_name", "ethnicity",
-                                                                         "stroke", "chd", "diabetes", "dementia", "heart_failure"),
-                                                          fun_names = c("sum","mean","median","min","max","count","n_distinct")),
+                              # div(id = "reports-tab", class = " tab-pane active show",# style = "display: none;",
+                              #     div(class = "container-fluid", style = "padding-left: 20%;",
+                              #         h3("Population Health Data - Interactive Pivot Analysis"),
+                              #         p(class='lead',"Drag columns to create custom analysis. Use dimensions for grouping, measures for aggregation."),
+                              #         div(style = "font-size: 0.6rem !important;",
+                              #             # Pivot module UI
+                              #             pivot_module_ui("pivot_reports",
+                              #                             data_names = c("sex", "age_risk", "county", "hsct", "bmi",
+                              #                                            "Urban_status", "mdm_quintile_soa_name", "ethnicity",
+                              #                                            "stroke", "chd", "diabetes", "dementia", "heart_failure"),
+                              #                             fun_names = c("sum","mean","median","min","max","count","n_distinct")),
+                              #
+                              #         )
+                              #     )
+                              # ),
 
-                                      )
-                                  )
-                              ),
-                              
                               # Orders Tab Content
-                              div(id = "ObesityRisk-tab", class = "  tab-pane show active ", style = "",
-                                  div( style = "padding-left: 17%;",
-                                       h3("Obesity Contributions to Obesity"),
-                                       p(class = 'lead', "Factors leading to the cause of Obesity and often accompany it ")
-                              ),
-                              
-                              div(id = "geography-tab", class = "tab-pane show active", style = " ",
-                                  div(class = "container-fluid",   style = "padding-left: 14%", #;width:100%
-                                      h3("Geography Analytics"),
-                                      p(class = 'lead',"A supplement to the <a onclick= alert('hello')>analytics</a> showing the heirarchical ")
-                              )
-                              ),
-                              
-                              div(id = "population-tab", class = "tab-pane show active ", style = " ",
-                                  div(class = "container-fluid",   style = "padding-left: 17%;",
-                                      h3(" Obesity Analytics"),
-                                      
-                                      p(class = 'lead', "Analysis of Obesity dynamic in the Population"),
+                              # div(id = "ObesityRisk-tab", class = "  tab-pane show active ", style = "",
+                              #     div( style = "padding-left: 17%;",
+                              #          h3("Obesity Contributions to Obesity"),
+                              #          p(class = 'lead', "Factors leading to the cause of Obesity and often accompany it ")
+                              # ),
 
-                                  )
-                              ),
-                              
-                              
-                              div(id = "lifestyle-tab", class = "  tab-pane show active ", style = " ",
-                                  div(style = "padding-left: 17%;",
-                                      h3("Lifestyle Dashboard"),
-                                      p(class = 'lead',"Deprivation content will be displayed here when the Users nav item is clicked."),
-                                      h6('Health Burden Attributable to obesity'),
-                                    
-       
-                                  )
-                              ),
-                              
+                              # div(id = "geography-tab", class = "tab-pane show active", style = " ",
+                              #     div(class = "container-fluid",   style = "padding-left: 14%", #;width:100%
+                              #         h3("Geography Analytics"),
+                              #         p(class = 'lead',"A supplement to the <a onclick= alert('hello')>analytics</a> showing the heirarchical ")
+                              # )
+                              # ),
+
+
+                              # div(id = "population-tab", class = "tab-pane show active ", style = " ",
+                              #     div(class = "container-fluid",   style = "padding-left: 17%;",
+                              #         h3(" Obesity Analytics"),
+                              #
+                              #         p(class = 'lead', "Analysis of Obesity dynamic in the Population"),
+                              #
+                              #     )
+                              # ),
+
+
+                              # div(id = "lifestyle-tab", class = "  tab-pane show active ", style = " ",
+                              #     div(style = "padding-left: 17%;",
+                              #         h3("Lifestyle Dashboard"),
+                              #         p(class = 'lead',"Deprivation content will be displayed here when the Users nav item is clicked."),
+                              #         h6('Health Burden Attributable to obesity'),
+                              #
+                              #
+                              #     )
+                              # ),
+
                               # Users Tab Content
-                              div(id = "deprivation-tab", class = "  tab-pane active show", style = " ",
-                                  div(class = "container-fluid",   style = "padding-left: 15%;",
-        
-                              ),
-                              
-                              
-                              
-                              div(id = "society-tab", class = "tab-pane show active", style = " ",
-                                  div(class = "container-fluid",   style = "padding-left: 17%;",
-                                   
-                                  )
-                              ),
-                              
-     
-                              
-            
+                              # div(id = "deprivation-tab", class = "  tab-pane active show", style = " ",
+                              #     div(class = "container-fluid",   style = "padding-left: 15%;",
+                              #
+                              # ),
+
+                              # div(id = "society-tab", class = "tab-pane show active", style = " ",
+                              #     div(class = "container-fluid",   style = "padding-left: 17%;",
+                              #
+                              #     )
+                              # ),
+
                           ) # End of tab-content-container
-                          
+
                       ), # Close content-area
-                      
+
                       # Initialize Packery with Click and Expand JavaScript
                       tags$script(HTML("
 $(document).ready(function() {
@@ -907,14 +961,14 @@ $(document).ready(function() {
     $grid.on('doubleclick', '.grid-item-content', function(event) {
       event.preventDefault();
       event.stopPropagation();
-      
+
       var itemElem = event.currentTarget.parentNode;
       var $item = $(itemElem);
       var isExpanded = $item.hasClass('is-expanded');
-      
+
       // Toggle the expanded class
       $item.toggleClass('is-expanded');
-      
+
       // Force a layout update after the CSS transition
       setTimeout(function() {
         if (isExpanded) {
@@ -928,13 +982,13 @@ $(document).ready(function() {
           }, 50);
         }
       }, 50); // Small delay to let CSS transition start
-      
+
       // Also trigger layout after CSS transition completes
       setTimeout(function() {
         $grid.packery();
       }, 150); // Match CSS transition duration (0.4s + buffer)
     });
-    
+
     $('.chart-card').on('click', function() {
       console.log('resize');
       // Trigger ECharts resize
@@ -950,21 +1004,21 @@ $(document).ready(function() {
         });
       }, 300);
     });
-    
+
     // Tab Navigation Functionality
     $('.nav-item').on('click', function() {
       // Remove active class from all nav items
       $('.nav-item').removeClass('active');
       // Add active class to clicked item
       $(this).addClass('active');
-      
+
       // Hide all tab content
       $('.tab-pane').removeClass('active show')
-      
+
       // Show corresponding tab content based on nav item text
       var navText = $(this).text().trim().toLowerCase();
       var tabId = '';
-      
+
       switch(navText) {
         case 'dashboard':
           tabId = 'dashboard-tab';
@@ -1008,16 +1062,16 @@ $(document).ready(function() {
         default:
           tabId = 'dashboard-tab';
       }
-      
+
       $('#' + tabId).addClass('active show')
-      
+
       // Re-initialize packery if dashboard tab is shown
       if (tabId === 'dashboard-tab') {
         setTimeout(function() {
           $('.grid').packery();
         }, 100);
       }
-      
+
       // Initialize pivot module if reports tab is shown
       if (tabId === 'reports-tab') {
         setTimeout(function() {
@@ -1025,7 +1079,7 @@ $(document).ready(function() {
           if (window.Shiny && window.Shiny.setInputValue) {
             window.Shiny.setInputValue('pivot_reports_tab_shown', Math.random());
           }
-          
+
           // Re-trigger any drag-drop initialization if needed
           if (typeof window.setupDropzone === 'function') {
             console.log('Re-initializing pivot drag-drop zones');
@@ -1038,24 +1092,34 @@ $(document).ready(function() {
         }, 200);
       }
     });
-    
-    
+
+
     // setTimeout(function() {
     //  $('.tab-pane').removeClass('active show')
     //  $('#' + 'specify-tab').addClass('active show')
     // }, 1000);
-     
+
       setTimeout(function() {
           $('.grid').packery();
         }, 100);
-     
+
   }, 500); // Small delay to ensure DOM is ready
-   
+
+  // Initialize Bootstrap Scrollspy
+  var scrollspyEl = document.querySelector('[data-bs-spy=\"scroll\"]');
+  if (scrollspyEl) {
+    var scrollspy = new bootstrap.ScrollSpy(scrollspyEl, {
+      target: '#top-nav-content',
+      offset: 80
+    });
+  }
+
 });
 "
-                      ))), # tab pane
-                  
-)),
+
+                      ) # End tags$script
+
+                  ), # End main-container
 
     footer()
 )
@@ -1064,7 +1128,7 @@ $(document).ready(function() {
 # SERVER
 # ============================================================================
 server <- function(input, output, session) {
-    
+
     output$prevalence_rates_graph <- renderPlot(prevalence_rates_graph)
     output$prevalent_counts_graph <- renderPlot(prevalent_counts_graph)
     output$prevalence_my_sim_graph <- renderPlot(prevalence_my_sim_graph)
@@ -1077,7 +1141,7 @@ server <- function(input, output, session) {
     output$child_referals <- renderPlot(child_referals)
     output$accepted_child_referals <- renderPlot(accepted_child_referals)
 
-    
+
 }
 
 

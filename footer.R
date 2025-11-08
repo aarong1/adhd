@@ -13,7 +13,7 @@ footer <- function(){
                                  <a href="#contact">Contact</a> -->
                                  </div>
                                  </div>
-                                 <img src = "pha.png" alt = "PHA Logo" style="height:40px;position:absolute;right:15px;top:10px;">
+                                 <!--<img src = "pha.png" alt = "PHA Logo" style="height:40px;position:absolute;right:15px;top:10px;"> -->
                                 </footer>
                                  <style>
                                  .dashboard-footer {
@@ -27,7 +27,7 @@ footer <- function(){
                                    border-top: 1px solid #e9ecef;
                                    margin-top: 20px;
                                  }
-                                 
+
                                  .footer-content {
                                    display: flex;
                                    justify-content: space-between;
