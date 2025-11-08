@@ -1117,8 +1117,8 @@ $(document).ready(function() {
 });
 "
 
-                      ) # End tags$script
-
+                      ), # End tags$script
+echarts4rOutput("dummy", height = "0px")
                   ), # End main-container
 
     footer()
@@ -1128,6 +1128,11 @@ $(document).ready(function() {
 # SERVER
 # ============================================================================
 server <- function(input, output, session) {
+
+    output$dummy <- renderEcharts4r({
+        echarts() %>%
+            e_theme('roma')}
+                                )
 
     output$prevalence_rates_graph <- renderPlot(prevalence_rates_graph)
     output$prevalent_counts_graph <- renderPlot(prevalent_counts_graph)
