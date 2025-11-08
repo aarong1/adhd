@@ -137,7 +137,7 @@ library(echarts4r)
                 #filter(sex =='Males') |>
                 group_by(paste(age,sex)  )) |>
       e_line( value) |> #name= 'empirical',
-      e_theme('roma') |>
+      # e_theme('roma') |>
       # e_x_axis(max = 30, axisLabel = as.character((1:36)+1999)) |>
       e_tooltip()
   )
@@ -204,7 +204,7 @@ library(echarts4r)
                 mutate(year= as.character(year)) |>
                 group_by(paste(sex,age))  ) |>
       e_line(value) |>
-      e_theme('roma') |>
+      # e_theme('roma') |>
       # e_x_axis(max = 30, axisLabel = as.character((1:36)+1999)) |>
       e_tooltip()
   )

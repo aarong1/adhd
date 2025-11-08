@@ -1132,7 +1132,8 @@ server <- function(input, output, session) {
     output$dummy <- renderEcharts4r({
         e_charts(mtcars ,cyl) %>%
             e_line(mpg) %>%
-            e_theme('roma')}
+            e_theme('roma')
+        }
                                 )
 
     output$prevalence_rates_graph <- renderPlot(prevalence_rates_graph)
