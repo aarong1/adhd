@@ -706,8 +706,6 @@ text-decoration:none !important;
         Results are by age, sex and HSCT.')
                                       ), # End evidence section # End incidence section
 
-
-
                                       # Prevalence Section
 
                                       div(id = "prevalence-section",class='min-vh-100',
@@ -718,13 +716,13 @@ text-decoration:none !important;
 
                                       div(class='d-flex flex-row py-5 justify-content-evenly gap-5 flex-wrap',#grid
 
-graph_wrapper(prevalence_rates_graph_e ,header=span(span(class='fs-5','ADHD Prevalence') ,
-                                                                span(class='m-1  badge rounded-pill text-bg-secondary','Rates'), div(class='text-muted','Estimated Actual'))),
+# graph_wrapper(prevalence_rates_graph_e ,header=span(span(class='fs-5','ADHD Prevalence') ,
+#                                                                 span(class='m-1  badge rounded-pill text-bg-secondary','Rates'), div(class='text-muted','Estimated Actual'))),
 
-graph_wrapper(prevalent_counts_e ,header=span(span(class='fs-5','Prevalence by age') ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
+graph_wrapper(prevalent_counts_e ,header=span(span(class='fs-5','Prevalence') ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
                                                                 span(class='ms-2 p-1 text-bg-secondary','Estimated Actual'))),
 
-graph_wrapper(prevalence_my_sim_e ,header=span(span(class='fs-5','Prevalence') ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
+graph_wrapper(prevalence_my_sim_e ,header=span(span(class='fs-5','Prevalence by age') ,span(class='ms-2  badge rounded-pill text-bg-secondary','Counts'),
                                                                  span(class='ms-2  badge rounded-pill text-bg-dark','Simulation'),
                                                                  span(class='ms-2 p-1 text-bg-dark','Estimated GP recorded'))),
 
