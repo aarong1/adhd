@@ -2,6 +2,12 @@
 # Prereqs: your 'pop' tibble exists with the columns used below.
 # Packages
 
+
+library(dplyr)
+library(tidyr)
+library(echarts4r)
+library(reactable)
+
 # main_output
 
 source('datasets.R')
@@ -27,8 +33,15 @@ pop <- pop |>
 pop <- pop |>
   left_join(sicbl,by = c('sex', age_adhd_sicbl='age'))
 
-pop$prev_rate_lower <-2.5/100
-pop$prev_rate_higher <- 3.4/100
+# pop %>% count(age>17) %>% mutate(n/sum(n))
+# # A tibble: 2 × 3
+# `age > 17`       n `n/sum(n)`
+# <lgl>        <int>      <dbl>
+#   1 FALSE       595289      0.270
+# 2 TRUE       1610502      0.730
+
+pop$prev_rate_lower <-2.5/100 *0.73 + 0.27*5/100
+pop$prev_rate_higher <- 3.4/100 *0.73 + 0.27*5/100
 
 pop$prev_rate_kid <- 5/100
 pop$prev_rate_adult <- 4/100
@@ -52,16 +65,12 @@ pop <- pop |>
 
 pop <- pop |>
   mutate(
-    ADHD_prev_nice = coalesce(ADHD_nice_kid, ADHD_nice_adult)
-  )
+    ADHD_prev_nice = coalesce(ADHD_nice_kid, ADHD_nice_adult))
 
 pop <- pop |>
   mutate(run = sample(1:10,replace = T,size=n()))
 
-library(dplyr)
-library(tidyr)
-library(echarts4r)
-library(reactable)
+
 
 # Helper: ensure year is a character (echarts is happiest this way)
 as_year_chr <- function(df) df %>% mutate(year = as.character(year))
@@ -100,8 +109,9 @@ e_common <- function(e, ylab = NULL, xlab = NULL,zoom = F) {
       nice = sum(ADHD_prev_nice == 'ADHD', na.rm = T)/n(),
       sim_baseline_prev = sum(ADHD_baseline == 'ADHD', na.rm = T)/n()*5,
       # sim_incid= sum(!is.na(ADHD_incid), na.rm = T)/n()*5,
-      sim_incid_prev = sum(!is.na(ADHD_incid_prev) , na.rm = T)/n()*5) |>
-
+      # sim_incid_prev = sum(!is.na(ADHD_incid_prev) , na.rm = T)/n()*5, #) |>
+      sim_incid_prev = (sum(!is.na(ADHD_baseline), na.rm = TRUE) * 5  + sum(!is.na(ADHD_incid), na.rm = TRUE))/n()
+    ) %>%
     pivot_longer(-c(year),
                  names_to = 'type',
                  values_to = 'prevalence') |>
@@ -126,7 +136,6 @@ e_common <- function(e, ylab = NULL, xlab = NULL,zoom = F) {
         digits = 1,
         locale = NULL
       )
-
     )
 )
 
@@ -138,9 +147,17 @@ e_common <- function(e, ylab = NULL, xlab = NULL,zoom = F) {
     lower = sum(ADHD_prev_lower == "ADHD", na.rm = TRUE) * 10,
     higher = sum(ADHD_prev_higher == "ADHD", na.rm = TRUE) * 10,
     nice = sum(ADHD_prev_nice == "ADHD", na.rm = TRUE) * 10,
-    sim_baseline_prev = sum(ADHD_baseline == "ADHD", na.rm = TRUE) * 5 * 10,
-    sim_incid_prev = sum(!is.na(ADHD_incid_prev), na.rm = TRUE) * 5 * 10
+    sim_baseline_prev = sum(ADHD_baseline == "ADHD", na.rm = TRUE)  * 10,#* 5
+    # sim_incid_prev = sum(!is.na(ADHD_incid_prev), na.rm = TRUE) * 5 *10 ,
+
+    sim_incid_prev = sum(!is.na(ADHD_baseline), na.rm = TRUE) *10, # * 5
+    sim_incid_prev_i = sum(!is.na(ADHD_incid), na.rm = TRUE)
   ) %>%
+    mutate(multiplier = 5 - (0:10)/10) %>%
+    # mutate(multiplier = 5 ) %>%
+        mutate(sim_baseline_prev= sim_baseline_prev* multiplier) %>%
+    mutate(sim_incid_prev = sim_incid_prev*multiplier + sim_incid_prev_i ) %>%
+    select(-c(multiplier,sim_incid_prev_i)) %>%
   pivot_longer(-year, names_to = "type", values_to = "count") %>%
     mutate(type = recode(type,
                          higher = 'Higher (3.4)',
@@ -172,6 +189,7 @@ e_common <- function(e, ylab = NULL, xlab = NULL,zoom = F) {
   filter((death > year) | is.na(death)) %>%
   count(year, age_adhd, ADHD_incid_prev = !is.na(ADHD_incid_prev)) %>%
   filter(ADHD_incid_prev) %>%
+    mutate(n = n*10*5) %>%
   as_year_chr() %>%
   group_by(age_adhd) %>%
   e_charts(year) %>%
@@ -186,6 +204,7 @@ e_common <- function(e, ylab = NULL, xlab = NULL,zoom = F) {
     count(year, HSCT, ADHD_incid_prev = !is.na(ADHD_incid_prev)) %>%
     filter(ADHD_incid_prev) %>%
     as_year_chr() %>%
+    mutate(n = n*10*5) %>%
     group_by(HSCT) %>%
     e_charts(year) %>%
     e_bar(n, stack = "total") %>%
@@ -193,8 +212,59 @@ e_common <- function(e, ylab = NULL, xlab = NULL,zoom = F) {
 )
 # 4) Yearly incidence (stacked by age group)
 
+comp <- expand.grid(year = 2020:2030,
+            age_adhd=c(
+              "0-2", "3-5", "6-9", "10-16", "16-17",
+              "18-29", "30-39", "40-49", "50+"
+            ),
+            run = 1:10)
+
+(yearly_incidence_e <- pop %>%
+    mutate(
+      age_adhd = factor(
+        age_adhd,
+        levels = c(
+          "0-2", "3-5", "6-9", "10-16", "16-17",
+          "18-29", "30-39", "40-49", "50+"
+        )
+      ),
+      age_kid = ifelse(age<18,'Child','Adult')) %>%
+  count(year,age_adhd,wt = incid_prob) %>%
+  mutate(n = round(n * 10)) %>%
+  as_year_chr() %>%
+  group_by(age_adhd) %>%
+  e_charts(year) %>%
+  e_bar(n, stack = "total") %>%
+  e_common("Year", ylab = "Incidence", zoom = F)
+)
+
 (
-  yearly_incidence_e <- pop%>%
+  yearly_incidence_e <- pop %>%
+    mutate(
+      age_adhd = factor(
+        age_adhd,
+        levels = c(
+          "0-2", "3-5", "6-9", "10-16", "16-17",
+          "18-29", "30-39", "40-49", "50+"
+        )
+      ),
+      age_kid = ifelse(age<18,'Child','Adult')) %>% #count(year)
+    count(year,age_kid,wt = incid_prob) %>%
+    mutate(n = round(n * 10)) %>%
+    as_year_chr() %>%
+    group_by(age_kid) %>%
+    e_charts(year) %>%
+    e_bar(n, stack = "total") %>%
+    e_common("Year", ylab = "Incidence", zoom = F)
+)
+
+16000/60*1.9*12
+# [1] 6840
+
+1500000*0.001
+# [1]1400
+
+incid_referrals <- pop %>%
   mutate(
     age_adhd = factor(
       age_adhd,
@@ -202,19 +272,41 @@ e_common <- function(e, ylab = NULL, xlab = NULL,zoom = F) {
         "0-2", "3-5", "6-9", "10-16", "16-17",
         "18-29", "30-39", "40-49", "50+"
       )
-    )
-  ) %>%
-  count(year, age_adhd, run, ADHD_incid = (year == ADHD_incid)) %>%
-  filter(T == ADHD_incid) %>%
-  group_by(year, age_adhd) %>%
-  summarise(n = mean(n), .groups = "drop") %>%
-  mutate(n = n * 100) %>%
-  as_year_chr() %>%
-  group_by(age_adhd) %>%
-  e_charts(year) %>%
-  e_bar(n, stack = "total") %>%
-  e_common("Year", ylab = "Incidence", zoom = F)
-)
+    ),
+    age_kid = ifelse(age<18,'Child','Adult')) %>%
+  count(year,age_kid,HSCT,wt = incid_prob) %>%
+  mutate(n = round(n * 10 )) %>%
+  pivot_wider(names_from = HSCT,values_from = n) %>%
+# arrange(desc(year)) #%>%
+  arrange(desc(age_kid))
+
+incid_referrals %>%
+  write.csv('incid_referrrals.csv')
+
+# (
+#   yearly_incidence_e <- pop %>%
+#   mutate(
+#     age_adhd = factor(
+#       age_adhd,
+#       levels = c(
+#         "0-2", "3-5", "6-9", "10-16", "16-17",
+#         "18-29", "30-39", "40-49", "50+"
+#       )
+#     )
+#   ) %>% #count(year, wt = incid_prob)
+#   count(year, age_adhd,  ADHD_incid = (year == ADHD_incid)) %>%
+#   filter(T == ADHD_incid) %>%
+#     right_join(comp) %>% #filter(is.na(n))
+#     replace_na(list(n=0)) %>%
+#   group_by(year, age_adhd) %>%
+#   summarise(n = mean(n), .groups = "drop") %>%
+#   mutate(n = n * 100) %>%
+#   as_year_chr() %>%
+#   group_by(age_adhd) %>%
+#   e_charts(year) %>%
+#   e_bar(n, stack = "total") %>%
+#   e_common("Year", ylab = "Incidence", zoom = F)
+# )
 
 # 5) "Cumulative" incidence (as currently computed in your code)
 
@@ -232,9 +324,9 @@ e_common <- function(e, ylab = NULL, xlab = NULL,zoom = F) {
     filter( (death > year) |is.na(death)) |>
     count(year,age_adhd ,ADHD_incid = !is.na( ADHD_incid)) |>
     filter(T==ADHD_incid) |>
-    # group_by(year,age_adhd) |>
-    # summarise(n = mean(n)*100) %>%
-    mutate(n = n*10) %>%
+    group_by(year,age_adhd) |>
+    summarise(n = mean(n)*100) %>%
+    # mutate(n = n*10) %>%
     as_year_chr() %>%
     group_by(age_adhd) %>%
     e_charts(year) %>%
@@ -243,16 +335,32 @@ e_common <- function(e, ylab = NULL, xlab = NULL,zoom = F) {
 )
 
 # 6) New adult transitions (turning 18 with ADHD_incid_prev)
+com1p = expand.grid(year = 2020:2030,
+                   run = 1:10)
+
 (
 new_adult_transitions_e <- pop %>%
   filter(age == 18, !is.na(ADHD_incid_prev)) %>%
-  count(year) %>%
-  mutate(n = n * 10) %>%
+  count(year,run) %>%
+  right_join(com1p) %>% #filter(is.na(n))
+  replace_na(list(n=0)) %>%
+    group_by(year) %>%
+    summarise(n=mean(n)) %>%
+  mutate(n = n * 100) %>%
   as_year_chr() %>%
   e_charts(year) %>%
-  e_bar(name = '18 Year Olds',n) %>%
+  e_bar(name = '18 Year Olds w/ ADHD',n) %>%
   e_common("Year", ylab = "Count", zoom = F)
 )
+
+pop %>%
+  filter(age == 18, !is.na(ADHD_incid_prev)) %>%
+  count(year,run) %>%
+  right_join(com1p) %>% #filter(is.na(n))
+  replace_na(list(n=0)) %>%
+  group_by(year) %>%
+  summarise(n=mean(n)) %>%
+  mutate(n = n * 100)
 
 # 7) Adult referrals (modelled, ≥18)
 adult_referrals_e <- pop %>%
@@ -274,6 +382,7 @@ adult_referrals_tbl <- pop %>%
   count(year, HSCT, ADHD_incid_prev = !is.na(ADHD_incid_prev), run) %>%
   # filter(!is.na(ADHD_incid_prev)) %>%
   filter(T==ADHD_incid_prev) %>%
+
   group_by(year, HSCT) %>%
   summarise(n = mean(n), .groups = "drop") %>%
   mutate(n = n * 10 * 10 * 5 * 0.1)
@@ -435,5 +544,6 @@ save(prevalence_rates_graph_e,
                 child_referrals_e,
                 accepted_child_referrals_e,file = 'deploy.RData'
       )
-rm(list=ls())
+#rm(list=ls())
  # load('deploy.RData')
+

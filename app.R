@@ -46,7 +46,7 @@ graph_wrapper <- function(..., header =NULL){
 ui <- page_fluid( id = 'main-content',
                   theme = bs_theme(version = 5,
                                    bootswatch = 'litera',
-                                   font_scale = 0.9,
+                                   font_scale = 0.7,
                                    primary = 'purple'),
 
                   # startup_overlay_div(5000,7000),
@@ -656,8 +656,8 @@ text-decoration:none !important;
                                       style = "padding-left: 15%;padding-top:5%;padding-right:8%",
 
                                       # Overview Section
-                                      div(id='overview-section',class='min-vh-100',
-                                          div(class=" bg-white text-dark p-4 my-5 opacity-100 shadow-sm",
+                                      div(id='overview-section',class='min-vh-100 pt-5 ',
+                                          div(class=" bg-white text-dark p-5 my-5 opacity-100 shadow-sm",
                                               h5('Overview'),
                                               span(class='','Comparison of approaches for prevalence and incidence')),
 
@@ -733,7 +733,7 @@ graph_wrapper(prevalence_HSCT_my_sim_e ,header=span(span(class='fs-5','Prevalenc
                                                span(class='ms-2 p-1 text-bg-dark','Estimated GP recorded'))),
 
                                       ),
-div(class='ms-2 fs-6  badge rounded-pill bg-primary', 'An underdiagnosis rate of 1-in-5 is used across ages',icon("arrow-up-right-from-square"))
+div(onclick = 'window.open("https://pmc.ncbi.nlm.nih.gov/articles/PMC9884156", "blank_")',class='ms-2 fs-6  badge rounded-pill bg-primary', 'An underdiagnosis rate of 1-in-5 is used across ages',icon("arrow-up-right-from-square"))
 
 ), # End prevalence section
 
@@ -789,7 +789,7 @@ div(id = "Links",class='min-vh-100 pt-5 mt-5',
 # d-flex flex-row gap-2 py-5
 
                                                  div(class = "grid-item nav-card float-left analytics bg-opacity-50",
-                                                     div(onclick = "window.open('https://pubmed.ncbi.nlm.nih.gov/37455585','_blank')",
+                                                     div(onclick = "window.open('https://cks.nice.org.uk/topics/attention-deficit-hyperactivity-disorder/background-information/prevalence','_blank')",
                                                          class = "nav-card-icon",
                                                          icon("arrow-up-right-from-square")),
                                                      div(class = "nav-card-title", "NICE"),

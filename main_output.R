@@ -4,7 +4,7 @@ source('datasets.R')
 source('analysis.R')
 source('simulate.R')
 
-# source("adult_psychiatry_survey.R")
+source("adult_psychiatry_survey.R")
 
 source('ppl_w_learning_disabilities_expt_stats.R')
 source('adhd_summary_linked_from_ahdh_uk.R')

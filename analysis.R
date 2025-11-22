@@ -55,38 +55,47 @@ library(echarts4r)
 #      # degree = 2,
 #      # family = "gaussian"
 #   )
-#
+
 # predict(object =  fit,
 #         newdata = tibble(year = 2000:2035)) |>
 #   set_names(2000:2035)
 
-{
+{# Incidence ---
   fit <- split(incidence |>
-                 filter(year>=2004)  |>
+                 filter(year>=2005)  |>
+                 # filter(year!=2014)  |>
+
                  mutate(value = str_split(value," ") |>
                           map_chr(1) |>
                           as.numeric()) |>
+                 group_by(age,sex) %>%
+                 mutate(of = first(value)) %>%
+                 ungroup() %>%
                  mutate(year=year-1999), f = ~age+sex) |>
 
     lapply(function(df){
-      #print(df);
+      # print(df);
       x <- glm(data = df,
                #offset = rep(200,nrow(df)),
                value ~
                  # sqrt(year+1),
-                 log(year+1),
-                 #year,
-
+                 # (year)^2,
+                 # log(year+1),
+                 exp(0.17 * year) ,
+                 # offset(of +
+                 # year ,
+              # link =
                # span = 0.4,
                # degree = 1,
                #family = poisson(link = "log")
-               family='gaussian'
+               # offset = 1,
+               # family=gaussian(link = power(lambda = 0.002))#'gaussian'
       )
 
     })
 
   preds <- lapply(fit,function(model){
-    predict(object =  model ,newdata = tibble(year = ((2000:2035)-1999 ) )
+    predict(object =  model ,newdata = tibble(year = ((2000:2030)-1999) )
             ,type='response' )
   })
 
@@ -118,24 +127,28 @@ library(echarts4r)
       ) %>%
       arrange(age) %>%
       group_by(paste(age,sex)) |>
+      filter(as.numeric(year) > 5)  |>
+
       mutate(year=as.character(as.numeric(year)+1999)) |>
       # filter(year>2003) |>#View()
       e_charts(year) |>
       # e_scatter(value) |>
       # e_title('Incidence','per100k person-years') |>
-      e_title(subtext = 'per100k person-years') |>
+      e_title('Incidence' , subtext = 'GP registered - per100k person-years - actual and projected') |>
 
-      e_legend(top='10%',type='scroll') |>
+      e_legend(top='10%') |> #,type='scroll'
       e_grid(top='30%')  |>
       # e_loess(name ='fitted lines',smooth = T,formula = value~year ,showSymbol = FALSE) |>
       # e_glm(name = 'fit',formula = value~year) |>
       e_line(  serie = value,itemStyle = list(opacity=0), lineStyle = list(opacity=1)) |>
       e_data( incidence |>
                 mutate(value = str_split(value," ") |>
-                         map_chr(1) |> as.numeric()) |>
+                         map_chr(1) |>
+                         as.numeric()) |>
                 mutate(year= as.character(year)) |>
+                filter(year !=2018) %>%
                 #filter(sex =='Males') |>
-                group_by(paste(age,sex)  )) |>
+                group_by(paste(age,sex)) )  |>
       e_line( value) |> #name= 'empirical',
       # e_theme('roma') |>
       # e_x_axis(max = 30, axisLabel = as.character((1:36)+1999)) |>
@@ -187,12 +200,12 @@ library(echarts4r)
   (
     prev_e <- prev_df |>
       group_by(paste(sex,age)) |>
-      # filter(as.numeric(year >5) |>
+      filter(as.numeric(year) > 5)  |>
       mutate(year=as.character(as.numeric(year)+1999)) |>
       e_charts(year) |>
       # e_scatter(value) |>
       # e_title('Prevalence','per10k') |>
-      e_title(subtext = 'per10k') |>
+      e_title('Prevalence', subtext = 'GP registered - per10k - actual and projected') |>
 
       e_legend(top='13%') |>
       e_grid(top='30%')  |>
@@ -208,12 +221,16 @@ library(echarts4r)
       # e_x_axis(max = 30, axisLabel = as.character((1:36)+1999)) |>
       e_tooltip()
   )
-
 }
 
  incid_df <- incid_df |>
   mutate(incid_prob = value /1e5, .keep = 'unused') |>
   mutate(year = as.numeric(year) + 1999)
+
+ person_years <- data.frame(
+ age_band = c('0-2', "3-5", "6-9",  "10-16", "16-17", "18-29", "30-39", "40-49", "50+"),
+ person_years  = c(3,3,4,7,2,12,10,10,50)
+ )
 
 prev_df <- prev_df |>
   mutate(prev_prob = value /1e4, .keep = 'unused') |>

@@ -1,9 +1,28 @@
 # simulate.R
+library(tidyverse)
+library(fst)
 
 x <- read_fst("./yearly_start_populations.fst")
 
 x <- x |>
-  mutate(death = na_if(death,0))
+  mutate(death = na_if(death,0)) |>
+  mutate(
+    age_adhd = cut(
+      as.numeric(age),
+      breaks = c(-Inf, 2, 5, 9, 15 ,17, 29, 39, 49, Inf),
+      labels = c("0-2", "3-5", "6-9", "10-16", "16-17", "18-29", "30-39", "40-49", "50+")
+    )
+    )
+
+pop_year_trust_age_band <- count(x,
+      year,
+      age_adhd,
+      HSCT, name='pop') %>%
+  mutate(pop = pop*10)
+
+count(pop_year_trust_age_band,year, wt=pop)
+
+write.csv(pop_year_trust_age_band, file = 'pop_estimatates_year_trust_age_band.csv')
 
 # x <- x |>
 #   as_tibble() |>
@@ -12,6 +31,8 @@ x <- x |>
 pop <- x |>
   select(id,age,HSCT,sex,year,death) #|>
 # slice_sample(prop=0.1)
+
+# pop <- rbind(pop,pop)
 
 pop <- pop |>
   #c("3-5", "6-9",  "10-15", "16-17",  "18-29", "30-39", "40-49", "50+")
@@ -64,7 +85,6 @@ pop <- pop |>
 
 pop |> count(ADHD,death)
 
-
 count(pop,ADHD,year)
 
 pop <- pop |>
@@ -90,7 +110,7 @@ exempt <-  exempt |>
           ADHD_incid_prev = NA)
 
 sus <- sus |>
-    mutate( ADHD_incid = ifelse(incid_prob/10 > runif(n()), year, NA))
+    mutate( ADHD_incid = ifelse(incid_prob/1 > runif(n()), year, NA))#/10
 
 count(sus,is.na(ADHD_incid),year)
 
